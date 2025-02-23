@@ -2,7 +2,6 @@ import json
 import math
 import cmath
 
-# Función para calcular la Transformada Discreta de Fourier (DFT)
 def calcular_dft(signal):
     N = len(signal)
     Y = []
@@ -17,7 +16,6 @@ def calcular_dft(signal):
         })  
     return Y
 
-# Función para calcular la Transformada Inversa de Fourier (IDFT)
 def calcular_idft(dft_result):
     N = len(dft_result)
     x_recuperada = []
@@ -29,23 +27,16 @@ def calcular_idft(dft_result):
         x_recuperada.append(round(suma.real / N))
     return x_recuperada
 
-# Función principal que recibe el evento
 def lambda_handler(event, context):
-    # Obtener la señal del evento
     signal = [float(value) for value in event.get("signal", [])]
-
-    # Calcular la DFT de la señal
-    dft_result = calcular_dft(signal)
-
-    # Calcular la IDFT a partir de la DFT
-    idft_result = calcular_idft(dft_result)
-
-    # Imprimir ambos resultados como listas
-    print("Transformada de Fourier (DFT):", dft_result)
-    print("Transformada Inversa de Fourier (IDFT):", idft_result)
-
-    # Retornar los resultados en formato JSON
-    return json.dumps({
-        "DFT": dft_result,
-        "signal": idft_result
-    })
+    transform_type = event.get("transform", "DFT")
+    
+    if transform_type == "DFT":
+        result = calcular_dft(signal)
+    elif transform_type == "IDFT":
+        dft_input = event.get("dft_input", [])
+        result = calcular_idft(dft_input)
+    else:
+        return json.dumps({"error": "Tipo de transformada no válido"})
+    
+    return json.dumps({"result": result})
