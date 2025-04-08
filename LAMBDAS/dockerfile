@@ -1,0 +1,17 @@
+FROM public.ecr.aws/lambda/python:3.10
+
+# Establecer el directorio de trabajo en LAMBDA_TASK_ROOT
+WORKDIR ${LAMBDA_TASK_ROOT}
+
+# Copiar y instalar dependencias de Python
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+# Instalar OpenCV en el entorno de Python (usando pip, no yum)
+RUN pip install opencv-python-headless
+
+# Copiar el código fuente de la Lambda
+COPY . ${LAMBDA_TASK_ROOT}
+
+# Definir el entrypoint de Lambda
+CMD ["lambda_function.handler"]
